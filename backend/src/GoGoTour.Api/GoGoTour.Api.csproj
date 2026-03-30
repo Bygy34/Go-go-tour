@@ -7,5 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="../GoGoTour.Application/GoGoTour.Application.csproj" />
     <ProjectReference Include="../GoGoTour.Infrastructure/GoGoTour.Infrastructure.csproj" />
+    <ProjectReference Include="..\GoGoTour.Domain\GoGoTour.Domain.csproj" />
   </ItemGroup>
 </Project>

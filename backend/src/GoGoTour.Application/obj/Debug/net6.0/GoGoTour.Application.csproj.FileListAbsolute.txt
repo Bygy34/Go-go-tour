@@ -1,0 +1,16 @@
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\obj\Debug\net6.0\GoGoTour.Application.csproj.AssemblyReference.cache
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\obj\Debug\net6.0\GoGoTour.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\obj\Debug\net6.0\GoGoTour.Application.AssemblyInfoInputs.cache
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\obj\Debug\net6.0\GoGoTour.Application.AssemblyInfo.cs
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\obj\Debug\net6.0\GoGoTour.Application.csproj.CoreCompileInputs.cache
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\obj\Debug\net6.0\GoGoTour.Application.sourcelink.json
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\bin\Debug\net6.0\GoGoTour.Application.deps.json
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\bin\Debug\net6.0\GoGoTour.Application.dll
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\bin\Debug\net6.0\GoGoTour.Application.pdb
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\bin\Debug\net6.0\GoGoTour.Domain.dll
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\bin\Debug\net6.0\GoGoTour.Domain.pdb
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\obj\Debug\net6.0\GoGoTour.40E0188C.Up2Date
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\obj\Debug\net6.0\GoGoTour.Application.dll
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\obj\Debug\net6.0\refint\GoGoTour.Application.dll
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\obj\Debug\net6.0\GoGoTour.Application.pdb
+C:\Users\zolotukhin.d\source\repos\Go-go-tour\backend\src\GoGoTour.Application\obj\Debug\net6.0\ref\GoGoTour.Application.dll

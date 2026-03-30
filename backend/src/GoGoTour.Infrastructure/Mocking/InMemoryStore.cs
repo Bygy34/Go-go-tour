@@ -4,8 +4,8 @@ namespace GoGoTour.Infrastructure.Mocking;
 
 public class InMemoryStore
 {
-    public List<Tour> Tours { get; } =
-    [
+    public List<Tour> Tours { get; } =new List<Tour>
+    {
         new Tour
         {
             Id = 1,
@@ -26,7 +26,7 @@ public class InMemoryStore
             DurationDays = 6,
             IsActive = true
         }
-    ];
+    };
 
-    public List<BookingRequest> BookingRequests { get; } = [];
+    public List<BookingRequest> BookingRequests { get; } = new List<BookingRequest>();
 }
