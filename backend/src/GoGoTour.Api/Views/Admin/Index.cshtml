@@ -1,0 +1,49 @@
+@model GoGoTour.Api.Models.AdminPageVm
+@{
+    ViewData["Title"] = "Админка";
+}
+<h2>Админ-панель</h2>
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+    <p><strong>@Model.Message</strong></p>
+}
+
+<form asp-action="SaveTour" asp-controller="Admin" method="post" class="card">
+    @Html.AntiForgeryToken()
+    <h3>@(Model.TourForm.Id.HasValue ? "Редактировать тур" : "Создать тур")</h3>
+    <input type="hidden" asp-for="TourForm.Id" />
+    <input asp-for="TourForm.Title" placeholder="Название" />
+    <input asp-for="TourForm.Country" placeholder="Страна" />
+    <textarea asp-for="TourForm.Description" placeholder="Описание"></textarea>
+    <input asp-for="TourForm.Price" placeholder="Цена" />
+    <input asp-for="TourForm.DurationDays" placeholder="Длительность" />
+    <label><input asp-for="TourForm.IsActive" /> Активен</label>
+    <button type="submit">Сохранить</button>
+</form>
+
+<h3>Туры</h3>
+<div class="grid">
+@foreach (var tour in Model.Tours)
+{
+    <article class="card">
+        <h4>@tour.Title</h4>
+        <p>@tour.Country</p>
+        <p>@tour.Price €</p>
+        <a href="/admin/edit/@tour.Id">Редактировать</a>
+    </article>
+}
+</div>
+
+<h3>Заявки</h3>
+<div class="grid">
+@foreach (var booking in Model.Bookings)
+{
+    <article class="card">
+        <h4>@booking.TourTitle</h4>
+        <p>@booking.FullName</p>
+        <p>@booking.Email</p>
+        <p>@booking.Phone</p>
+        <p>@booking.Message</p>
+    </article>
+}
+</div>
