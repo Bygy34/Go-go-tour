@@ -1,71 +1,66 @@
-using GoGoTour.Api.Models;
 using GoGoTour.Application.DTOs;
 using GoGoTour.Application.Services;
+using GoGoTour.Infrastructure.Security;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace GoGoTour.Api.Controllers;
 
-public class ToursController : Controller
+[Route("api/tours")]
+public class ToursController : BaseAdminController
 {
     private readonly TourService _tourService;
-    private readonly BookingService _bookingService;
 
-    public ToursController(TourService tourService, BookingService bookingService)
+    public ToursController(TourService tourService, IOptions<AdminAuthOptions> adminAuthOptions) : base(adminAuthOptions)
     {
         _tourService = tourService;
-        _bookingService = bookingService;
     }
 
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<TourSummaryDto>>> GetActiveTours(CancellationToken cancellationToken)
     {
-        var tours = await _tourService.GetActiveToursAsync(cancellationToken);
-        return View(tours);
+        return Ok(await _tourService.GetActiveToursAsync(cancellationToken));
     }
 
-    [HttpGet("tours/{id:int}")]
-    public async Task<IActionResult> Details(int id, CancellationToken cancellationToken)
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<TourDetailDto>> GetById([FromRoute] int id, CancellationToken cancellationToken)
     {
-        var tour = await _tourService.GetDetailsAsync(id, cancellationToken);
-        if (tour is null)
-        {
-            return NotFound();
-        }
-
-        var model = new TourDetailsPageVm
-        {
-            Tour = tour,
-            BookingForm = new BookingFormVm { TourId = id }
-        };
-
-        return View(model);
+        var tour = await _tourService.GetTourByIdAsync(id, cancellationToken);
+        return tour is null ? NotFound() : Ok(tour);
     }
 
-    [HttpPost("tours/{id:int}/book")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Book(int id, BookingFormVm form, CancellationToken cancellationToken)
+    [HttpGet("admin")]
+    public async Task<ActionResult<IReadOnlyList<TourDetailDto>>> GetAdminTours(CancellationToken cancellationToken)
     {
-        var tour = await _tourService.GetDetailsAsync(id, cancellationToken);
-        if (tour is null)
+        if (!IsAuthorizedAdmin())
         {
-            return NotFound();
+            return Unauthorized("Admin token is invalid");
         }
 
-        if (!ModelState.IsValid)
+        return Ok(await _tourService.GetAllToursForAdminAsync(cancellationToken));
+    }
+
+    [HttpPost("admin")]
+    public async Task<ActionResult<int>> Create([FromBody] UpsertTourDto dto, CancellationToken cancellationToken)
+    {
+        if (!IsAuthorizedAdmin())
         {
-            return View("Details", new TourDetailsPageVm { Tour = tour, BookingForm = form, StatusMessage = "Проверьте форму." });
+            return Unauthorized("Admin token is invalid");
         }
 
-        var created = await _bookingService.CreateAsync(
-            new CreateBookingDto(id, form.FullName, form.Email, form.Phone, form.Message),
-            cancellationToken);
+        var id = await _tourService.CreateTourAsync(dto, cancellationToken);
+        return Ok(id);
+    }
 
-        var vm = new TourDetailsPageVm
+    [HttpPut("admin/{id:int}")]
+    public async Task<ActionResult> Update([FromRoute] int id, [FromBody] UpsertTourDto dto, CancellationToken cancellationToken)
+    {
+        if (!IsAuthorizedAdmin())
         {
-            Tour = tour,
-            BookingForm = new BookingFormVm { TourId = id },
-            StatusMessage = created ? "Заявка отправлена." : "Не удалось отправить заявку."
-        };
+            return Unauthorized("Admin token is invalid");
+        }
 
-        return View("Details", vm);
+        var updated = await _tourService.UpdateTourAsync(id, dto, cancellationToken);
+        return updated ? NoContent() : NotFound();
     }
 }

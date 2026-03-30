@@ -1,31 +1,50 @@
 using GoGoTour.Application.Abstractions;
 using GoGoTour.Application.Services;
-using GoGoTour.Infrastructure.Mocking;
+using GoGoTour.Infrastructure.Persistence;
+using GoGoTour.Infrastructure.Security;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<InMemoryStore>();
-builder.Services.AddSingleton(typeof(IGenericRepository<>), typeof(InMemoryGenericRepository<>));
+builder.Services.Configure<AdminAuthOptions>(builder.Configuration.GetSection(AdminAuthOptions.SectionName));
 
+builder.Services.AddDbContext<GoGoTourDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IGoGoTourDbContext>(sp => sp.GetRequiredService<GoGoTourDbContext>());
 builder.Services.AddScoped<TourService>();
 builder.Services.AddScoped<BookingService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    var db = scope.ServiceProvider.GetRequiredService<GoGoTourDbContext>();
+    await DbInitializer.InitializeAsync(db);
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseCors("Frontend");
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();

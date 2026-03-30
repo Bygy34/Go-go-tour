@@ -1,58 +1,57 @@
 using GoGoTour.Application.Abstractions;
 using GoGoTour.Application.DTOs;
 using GoGoTour.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace GoGoTour.Application.Services;
 
 public class BookingService
 {
-    private readonly IGenericRepository<BookingRequest> _bookingRepository;
-    private readonly IGenericRepository<Tour> _tourRepository;
+    private readonly IGoGoTourDbContext _dbContext;
 
-    public BookingService(
-        IGenericRepository<BookingRequest> bookingRepository,
-        IGenericRepository<Tour> tourRepository)
+    public BookingService(IGoGoTourDbContext dbContext)
     {
-        _bookingRepository = bookingRepository;
-        _tourRepository = tourRepository;
+        _dbContext = dbContext;
     }
 
-    public async Task<bool> CreateAsync(CreateBookingDto dto, CancellationToken cancellationToken = default)
+    public async Task<bool> CreateBookingAsync(int tourId, CreateBookingRequestDto dto, CancellationToken cancellationToken = default)
     {
-        var tour = await _tourRepository.GetByIdAsync(dto.TourId, cancellationToken);
-        if (tour is null || !tour.IsActive)
+        var tourExists = await _dbContext.Tours.AnyAsync(t => t.Id == tourId && t.IsActive, cancellationToken);
+        if (!tourExists)
         {
             return false;
         }
 
-        await _bookingRepository.AddAsync(new BookingRequest
+        var booking = new BookingRequest
         {
-            TourId = dto.TourId,
+            TourId = tourId,
             FullName = dto.FullName,
             Email = dto.Email,
             Phone = dto.Phone,
             Message = dto.Message,
             CreatedAtUtc = DateTime.UtcNow
-        }, cancellationToken);
+        };
+
+        _dbContext.BookingRequests.Add(booking);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return true;
     }
 
-    public async Task<IReadOnlyList<BookingListItemDto>> GetAllForAdminAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<BookingAdminDto>> GetAllForAdminAsync(CancellationToken cancellationToken = default)
     {
-        var bookings = await _bookingRepository.GetAllAsync(cancellationToken);
-        var tours = await _tourRepository.GetAllAsync(cancellationToken);
-
-        return bookings
+        return await _dbContext.BookingRequests
+            .Include(b => b.Tour)
             .OrderByDescending(b => b.CreatedAtUtc)
-            .Select(b => new BookingListItemDto(
+            .Select(b => new BookingAdminDto(
                 b.Id,
-                tours.FirstOrDefault(t => t.Id == b.TourId)?.Title ?? "Неизвестный тур",
+                b.TourId,
+                b.Tour != null ? b.Tour.Title : "(Удаленный тур)",
                 b.FullName,
                 b.Email,
                 b.Phone,
                 b.Message,
                 b.CreatedAtUtc))
-            .ToList();
+            .ToListAsync(cancellationToken);
     }
 }

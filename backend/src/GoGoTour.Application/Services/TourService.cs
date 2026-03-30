@@ -1,52 +1,47 @@
 using GoGoTour.Application.Abstractions;
 using GoGoTour.Application.DTOs;
 using GoGoTour.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace GoGoTour.Application.Services;
 
 public class TourService
 {
-    private readonly IGenericRepository<Tour> _tourRepository;
+    private readonly IGoGoTourDbContext _dbContext;
 
-    public TourService(IGenericRepository<Tour> tourRepository)
+    public TourService(IGoGoTourDbContext dbContext)
     {
-        _tourRepository = tourRepository;
+        _dbContext = dbContext;
     }
 
-    public async Task<IReadOnlyList<TourCardDto>> GetActiveToursAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<TourSummaryDto>> GetActiveToursAsync(CancellationToken cancellationToken = default)
     {
-        var tours = await _tourRepository.GetAllAsync(cancellationToken);
-
-        return tours
+        return await _dbContext.Tours
             .Where(t => t.IsActive)
             .OrderBy(t => t.Title)
-            .Select(t => new TourCardDto(t.Id, t.Title, t.Country, t.Price, t.DurationDays))
-            .ToList();
+            .Select(t => new TourSummaryDto(t.Id, t.Title, t.Country, t.Price, t.DurationDays))
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<TourDetailsDto?> GetDetailsAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<TourDetailDto?> GetTourByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var tour = await _tourRepository.GetByIdAsync(id, cancellationToken);
-        if (tour is null || !tour.IsActive)
-        {
-            return null;
-        }
-
-        return new TourDetailsDto(tour.Id, tour.Title, tour.Country, tour.Description, tour.Price, tour.DurationDays);
+        return await _dbContext.Tours
+            .Where(t => t.IsActive && t.Id == id)
+            .Select(t => new TourDetailDto(t.Id, t.Title, t.Country, t.Description, t.Price, t.DurationDays))
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<TourDetailsDto>> GetAllForAdminAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<TourDetailDto>> GetAllToursForAdminAsync(CancellationToken cancellationToken = default)
     {
-        var tours = await _tourRepository.GetAllAsync(cancellationToken);
-        return tours
-            .OrderByDescending(x => x.Id)
-            .Select(t => new TourDetailsDto(t.Id, t.Title, t.Country, t.Description, t.Price, t.DurationDays))
-            .ToList();
+        return await _dbContext.Tours
+            .OrderByDescending(t => t.Id)
+            .Select(t => new TourDetailDto(t.Id, t.Title, t.Country, t.Description, t.Price, t.DurationDays))
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task CreateAsync(UpsertTourDto dto, CancellationToken cancellationToken = default)
+    public async Task<int> CreateTourAsync(UpsertTourDto dto, CancellationToken cancellationToken = default)
     {
-        await _tourRepository.AddAsync(new Tour
+        var entity = new Tour
         {
             Title = dto.Title,
             Country = dto.Country,
@@ -54,24 +49,29 @@ public class TourService
             Price = dto.Price,
             DurationDays = dto.DurationDays,
             IsActive = dto.IsActive
-        }, cancellationToken);
+        };
+
+        _dbContext.Tours.Add(entity);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return entity.Id;
     }
 
-    public async Task<bool> UpdateAsync(int id, UpsertTourDto dto, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateTourAsync(int id, UpsertTourDto dto, CancellationToken cancellationToken = default)
     {
-        var current = await _tourRepository.GetByIdAsync(id, cancellationToken);
-        if (current is null)
+        var entity = await _dbContext.Tours.FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+        if (entity is null)
         {
             return false;
         }
 
-        current.Title = dto.Title;
-        current.Country = dto.Country;
-        current.Description = dto.Description;
-        current.Price = dto.Price;
-        current.DurationDays = dto.DurationDays;
-        current.IsActive = dto.IsActive;
+        entity.Title = dto.Title;
+        entity.Country = dto.Country;
+        entity.Description = dto.Description;
+        entity.Price = dto.Price;
+        entity.DurationDays = dto.DurationDays;
+        entity.IsActive = dto.IsActive;
 
-        return await _tourRepository.UpdateAsync(current, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return true;
     }
 }
