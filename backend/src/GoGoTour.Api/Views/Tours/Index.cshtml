@@ -1,0 +1,17 @@
+@model IReadOnlyList<GoGoTour.Application.DTOs.TourCardDto>
+@{
+    ViewData["Title"] = "Туры";
+}
+<h2>Выбор тура</h2>
+<div class="grid">
+@foreach (var tour in Model)
+{
+    <article class="card">
+        <h3>@tour.Title</h3>
+        <p>@tour.Country</p>
+        <p>@tour.DurationDays дней</p>
+        <strong>@tour.Price €</strong>
+        <div><a href="/tours/@tour.Id">Подробнее</a></div>
+    </article>
+}
+</div>
