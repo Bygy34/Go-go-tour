@@ -1,0 +1,26 @@
+@model GoGoTour.Api.Models.TourDetailsPageVm
+@{
+    ViewData["Title"] = "Детали тура";
+}
+<article class="card">
+    <h2>@Model.Tour.Title</h2>
+    <p>@Model.Tour.Country</p>
+    <p>@Model.Tour.DurationDays дней</p>
+    <p>@Model.Tour.Description</p>
+    <strong>@Model.Tour.Price €</strong>
+</article>
+
+@if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+{
+    <p><strong>@Model.StatusMessage</strong></p>
+}
+
+<form asp-action="Book" asp-controller="Tours" asp-route-id="@Model.Tour.Id" method="post" class="card">
+    @Html.AntiForgeryToken()
+    <h3>Форма записи</h3>
+    <input asp-for="BookingForm.FullName" placeholder="ФИО" />
+    <input asp-for="BookingForm.Email" placeholder="Email" />
+    <input asp-for="BookingForm.Phone" placeholder="Телефон" />
+    <textarea asp-for="BookingForm.Message" placeholder="Комментарий"></textarea>
+    <button type="submit">Отправить заявку</button>
+</form>
