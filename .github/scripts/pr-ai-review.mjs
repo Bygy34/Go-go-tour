@@ -239,7 +239,10 @@ async function runAiReview(pr, files, jiraTicket) {
     "",
     "## 6. \u0410\u0440\u0445\u0438\u0442\u0435\u043A\u0442\u0443\u0440\u0430 \u0438 SOLID",
     "Findings or '\u041D\u0435\u0442 \u0437\u0430\u043C\u0435\u0447\u0430\u043D\u0438\u0439'.",
-ria`,
+    "",
+    ...(jiraTicket
+      ? [
+          `## 7. Jira ${jiraTicket.key}: Acceptance Criteria`,
           "For each criterion: \u2705 covered / \u26A0\uFE0F partial / \u274C not covered.",
           "End with overall verdict: all criteria met or not.",
           "",
