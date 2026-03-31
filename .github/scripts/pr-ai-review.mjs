@@ -1,5 +1,4 @@
 const githubToken = process.env.GITHUB_TOKEN;
-const githubToken = process.env.GITHUB_TOKEN;
 const model = process.env.AI_MODEL || "gpt-4o-mini";
 const repo = process.env.GITHUB_REPOSITORY;
 const prNumber = process.env.PR_NUMBER;
