@@ -78,8 +78,17 @@ function buildDiffPayload(files) {
 }
 
 function extractJiraKey(text) {
-  const match = text?.match(/[A-Z][A-Z0-9]+-\d+/);
+  // Normalize slashes (e.g. feature/ET-6-my-branch -> ET-6-my-branch)
+  const normalized = text?.replace(/^.*\//, "");
+  const match = normalized?.match(/[A-Z][A-Z0-9]+-\d+/);
   return match ? match[0] : null;
+}
+
+function getJiraKeySource(pr) {
+  if (extractJiraKey(pr.head?.ref))   return { key: extractJiraKey(pr.head.ref),  source: `branch (${pr.head.ref})` };
+  if (extractJiraKey(pr.title))       return { key: extractJiraKey(pr.title),     source: "PR title" };
+  if (extractJiraKey(pr.body))        return { key: extractJiraKey(pr.body),      source: "PR body" };
+  return null;
 }
 
 async function getJiraTicket(pr) {
@@ -87,17 +96,20 @@ async function getJiraTicket(pr) {
     return null;
   }
 
-  const key =
-    extractJiraKey(pr.head?.ref) ||
-    extractJiraKey(pr.title) ||
-    extractJiraKey(pr.body);
+  const found = getJiraKeySource(pr);
+  if (!found) return null;
+  const { key, source } = found;
+  console.log(`Jira key "${key}" extracted from: ${source}`);
 
-  if (!key) {
+  // kept for compatibility — used below
+  const _key = key;
+
+  if (!_key) {
     return null;
   }
 
   // customfield_10016 — standard Acceptance Criteria field in Jira (may vary per instance)
-  const url = `${jiraBaseUrl}/rest/api/3/issue/${key}?fields=summary,description,customfield_10016`;
+  const url = `${jiraBaseUrl}/rest/api/3/issue/${_key}?fields=summary,description,customfield_10016`;
   const response = await fetch(url, {
     headers: {
       Authorization: `Basic ${Buffer.from(`${jiraEmail}:${jiraToken}`).toString("base64")}`,
@@ -106,7 +118,7 @@ async function getJiraTicket(pr) {
   });
 
   if (!response.ok) {
-    console.warn(`Jira API ${response.status} for key ${key} — skipping Jira context.`);
+    console.warn(`Jira API ${response.status} for key ${_key} — skipping Jira context.`);
     return null;
   }
 
@@ -119,7 +131,7 @@ async function getJiraTicket(pr) {
     extractAdfText(fields["customfield_10016"]) ||
     extractAcFromText(description);
 
-  return { key, summary, description, acceptanceCriteria: acField };
+  return { key: _key, summary, description, acceptanceCriteria: acField };
 }
 
 function extractAdfText(node) {
