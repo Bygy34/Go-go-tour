@@ -1,66 +1,7 @@
-namespace GoGoTour.Application.DTOs
-{
-    public class TourCardDto
-    {
-        public TourCardDto() { }
+namespace GoGoTour.Application.DTOs;
 
-        public TourCardDto(int id, string title, string country, decimal price, int durationDays)
-        {
-            Id = id;
-            Title = title;
-            Country = country;
-            Price = price;
-            DurationDays = durationDays;
-        }
+public record TourSummaryDto(int Id, string Title, string Country, decimal Price, int DurationDays);
 
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Country { get; set; }
-        public decimal Price { get; set; }
-        public int DurationDays { get; set; }
-    }
+public record TourDetailDto(int Id, string Title, string Country, string Description, decimal Price, int DurationDays);
 
-    public class TourDetailsDto
-    {
-        public TourDetailsDto() { }
-
-        public TourDetailsDto(int id, string title, string country, string description, decimal price, int durationDays)
-        {
-            Id = id;
-            Title = title;
-            Country = country;
-            Description = description;
-            Price = price;
-            DurationDays = durationDays;
-        }
-
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Country { get; set; }
-        public string Description { get; set; }
-        public decimal Price { get; set; }
-        public int DurationDays { get; set; }
-    }
-
-    public class UpsertTourDto
-    {
-        public UpsertTourDto() { }
-
-        public UpsertTourDto(string title, string country, string description, decimal price, int durationDays, bool isActive)
-        {
-            Title = title;
-            Country = country;
-            Description = description;
-            Price = price;
-            DurationDays = durationDays;
-            IsActive = isActive;
-        }
-
-        public string Title { get; set; }
-        public string Country { get; set; }
-        public string Description { get; set; }
-        public decimal Price { get; set; }
-        public int DurationDays { get; set; }
-        public bool IsActive { get; set; }
-    }
-}
+public record UpsertTourDto(string Title, string Country, string Description, decimal Price, int DurationDays, bool IsActive);

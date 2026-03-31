@@ -1,52 +1,50 @@
 using GoGoTour.Application.Abstractions;
 using GoGoTour.Application.Services;
-using GoGoTour.Infrastructure.Mocking;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using GoGoTour.Infrastructure.Persistence;
+using GoGoTour.Infrastructure.Security;
+using Microsoft.EntityFrameworkCore;
 
-namespace GoGoTour.Api
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<AdminAuthOptions>(builder.Configuration.GetSection(AdminAuthOptions.SectionName));
+
+builder.Services.AddDbContext<GoGoTourDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IGoGoTourDbContext>(sp => sp.GetRequiredService<GoGoTourDbContext>());
+builder.Services.AddScoped<TourService>();
+builder.Services.AddScoped<BookingService>();
+
+builder.Services.AddCors(options =>
 {
-    public class Program
+    options.AddPolicy("Frontend", policy =>
     {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.ConfigureServices(services =>
-                    {
-                        services.AddControllersWithViews();
-                        services.AddSingleton<InMemoryStore>();
-                        services.AddSingleton(typeof(IGenericRepository<>), typeof(InMemoryGenericRepository<>));
-                        services.AddScoped<TourService>();
-                        services.AddScoped<BookingService>();
-                    });
+var app = builder.Build();
 
-                    webBuilder.Configure((context, app) =>
-                    {
-                        if (!context.HostingEnvironment.IsDevelopment())
-                        {
-                            app.UseExceptionHandler("/Home/Error");
-                            app.UseHsts();
-                        }
-
-                        app.UseHttpsRedirection();
-                        app.UseStaticFiles();
-                        app.UseRouting();
-                        app.UseEndpoints(endpoints =>
-                        {
-                            endpoints.MapControllerRoute(
-                                name: "default",
-                                pattern: "{controller=Home}/{action=Index}/{id?}");
-                        });
-                    });
-                });
-        }
-    }
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<GoGoTourDbContext>();
+    await DbInitializer.InitializeAsync(db);
 }
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseCors("Frontend");
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();

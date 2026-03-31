@@ -1,31 +1,22 @@
-using System.Collections.Generic;
 using GoGoTour.Application.DTOs;
 
-namespace GoGoTour.Api.Models
+namespace GoGoTour.Api.Models;
+
+public class AdminPageVm
 {
-    public class AdminPageVm
-    {
-        public AdminPageVm()
-        {
-            Tours = new List<TourDetailsDto>();
-            Bookings = new List<BookingListItemDto>();
-            TourForm = new TourFormVm();
-        }
+    public List<TourDetailsDto> Tours { get; set; } = new List<TourDetailsDto>();
+    public List<BookingListItemDto> Bookings { get; set; } = new List<BookingListItemDto>();
+    public TourFormVm TourForm { get; set; } = new();
+    public string? Message { get; set; }
+}
 
-        public List<TourDetailsDto> Tours { get; set; }
-        public List<BookingListItemDto> Bookings { get; set; }
-        public TourFormVm TourForm { get; set; }
-        public string Message { get; set; }
-    }
-
-    public class TourFormVm
-    {
-        public int? Id { get; set; }
-        public string Title { get; set; }
-        public string Country { get; set; }
-        public string Description { get; set; }
-        public decimal Price { get; set; }
-        public int DurationDays { get; set; }
-        public bool IsActive { get; set; }
-    }
+public class TourFormVm
+{
+    public int? Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Country { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public int DurationDays { get; set; }
+    public bool IsActive { get; set; } = true;
 }

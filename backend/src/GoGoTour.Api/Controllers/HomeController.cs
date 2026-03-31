@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace GoGoTour.Api.Controllers
+namespace GoGoTour.Api.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    public IActionResult Index()
     {
-        public IActionResult Index()
-        {
-            return RedirectToAction("Index", "Tours");
-        }
+        return RedirectToAction("Index", "Tours");
     }
 }

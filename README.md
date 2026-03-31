@@ -1,25 +1,47 @@
-# GoGo Tour (MVC test project)
+# GoGo Tour (Test Project)
 
-Обновленный тестовый проект без SPA/Angular и без реальной БД.
+Тестовый монолитный проект для турагентства:
+- **Frontend**: React SPA (2 основные страницы: список туров и детали + форма заявки).
+- **Admin UI**: создание/редактирование туров, просмотр заявок.
+- **Backend**: ASP.NET Core Web API на **.NET 6** с разделением на слои в стиле Clean Architecture.
+- **База данных**: реляционная SQLite через **Entity Framework Core (Code First)**.
 
-## Что сделано
-- Переведено на **ASP.NET Core MVC (.NET 6)**.
-- Код переведен на совместимый синтаксис **C# 6** (без `record`, top-level statements и новых языковых конструкций).
-- Есть 2 пользовательские страницы:
-  - `/` — выбор тура.
-  - `/tours/{id}` — детали тура + форма записи.
-- Есть админ-страница:
-  - `/admin` — создание/редактирование туров и просмотр заявок.
-- Уровень хранения данных замокан через **generic repository** и in-memory store (фиктивные данные).
-- Добавлен единый solution-файл: `GoGoTour.sln`.
+## Структура
 
-## Архитектура
-- `GoGoTour.Domain` — сущности (`Tour`, `BookingRequest`).
-- `GoGoTour.Application` — абстракция `IGenericRepository<T>`, DTO, бизнес-сервисы.
-- `GoGoTour.Infrastructure` — `InMemoryStore` и `InMemoryGenericRepository<T>` (имитация БД).
-- `GoGoTour.Api` — MVC контроллеры и Razor Views.
+- `frontend/` — React SPA на Vite.
+- `backend/src/GoGoTour.Domain` — сущности домена.
+- `backend/src/GoGoTour.Application` — DTO + сервисы use-case.
+- `backend/src/GoGoTour.Infrastructure` — EF Core DbContext и инфраструктура.
+- `backend/src/GoGoTour.Api` — API контроллеры и DI-конфигурация.
 
-## Запуск
+## API
+
+### Public
+- `GET /api/tours` — активные туры.
+- `GET /api/tours/{id}` — детали тура.
+- `POST /api/bookings/{tourId}` — отправка заявки.
+
+### Admin (header `X-Admin-Token`)
+- `GET /api/tours/admin` — все туры.
+- `POST /api/tours/admin` — создать тур.
+- `PUT /api/tours/admin/{id}` — редактировать тур.
+- `GET /api/bookings/admin` — все заявки.
+
+## Локальный запуск
+
+### Backend
 1. Установить .NET 6 SDK.
-2. Открыть `GoGoTour.sln` в Visual Studio / Rider.
-3. Запустить проект `GoGoTour.Api`.
+2. Из `backend/src/GoGoTour.Api` выполнить:
+   - `dotnet restore`
+   - `dotnet run`
+
+По умолчанию админ-токен в `appsettings.json`:
+`super-admin-token`
+
+### Frontend
+1. Установить Node.js 18+.
+2. Из `frontend` выполнить:
+   - `npm install`
+   - `npm run dev`
+
+Frontend ожидает API по адресу `http://localhost:5000/api`.
