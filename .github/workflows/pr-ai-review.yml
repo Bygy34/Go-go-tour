@@ -1,5 +1,4 @@
 name: PR AI Review
-name: PR AI Review
 
 on:
   pull_request:
