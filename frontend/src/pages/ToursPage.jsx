@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
-const API = 'http://localhost:5000/api'
+const API = '/api'
 
 export default function ToursPage() {
   const [tours, setTours] = useState([])

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const API = 'http://localhost:5000/api'
+const API = '/api'
 
 export default function BookingForm({ tourId }) {
   const [form, setForm] = useState({ fullName: '', email: '', phone: '', message: '' })

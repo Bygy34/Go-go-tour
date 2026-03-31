@@ -15,7 +15,7 @@
     <p><strong>@Model.StatusMessage</strong></p>
 }
 
-<form asp-action="Book" asp-controller="Tours" asp-route-id="@Model.Tour.Id" method="post" class="card">
+<form asp-action="Book" asp-controller="ToursPage" asp-route-id="@Model.Tour.Id" method="post" class="card">
     @Html.AntiForgeryToken()
     <h3>Форма записи</h3>
     <input asp-for="BookingForm.FullName" placeholder="ФИО" />

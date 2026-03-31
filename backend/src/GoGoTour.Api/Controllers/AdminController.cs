@@ -1,16 +1,16 @@
 using GoGoTour.Api.Models;
+using GoGoTour.Application.Abstractions;
 using GoGoTour.Application.DTOs;
-using GoGoTour.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GoGoTour.Api.Controllers;
 
 public class AdminController : Controller
 {
-    private readonly TourService _tourService;
-    private readonly BookingService _bookingService;
+    private readonly ITourService _tourService;
+    private readonly IBookingService _bookingService;
 
-    public AdminController(TourService tourService, BookingService bookingService)
+    public AdminController(ITourService tourService, IBookingService bookingService)
     {
         _tourService = tourService;
         _bookingService = bookingService;
@@ -29,11 +29,11 @@ public class AdminController : Controller
     {
         if (form.Id.HasValue)
         {
-            await _tourService.UpdateAsync(form.Id.Value, new UpsertTourDto(form.Title, form.Country, form.Description, form.Price, form.DurationDays, form.IsActive), cancellationToken);
+            await _tourService.UpdateTourAsync(form.Id.Value, new UpsertTourDto(form.Title, form.Country, form.Description, form.Price, form.DurationDays, form.IsActive), cancellationToken);
         }
         else
         {
-            await _tourService.CreateAsync(new UpsertTourDto(form.Title, form.Country, form.Description, form.Price, form.DurationDays, form.IsActive), cancellationToken);
+            await _tourService.CreateTourAsync(new UpsertTourDto(form.Title, form.Country, form.Description, form.Price, form.DurationDays, form.IsActive), cancellationToken);
         }
 
         var vm = await BuildPageVm(cancellationToken);
@@ -70,7 +70,7 @@ public class AdminController : Controller
     {
         return new AdminPageVm
         {
-            Tours = (await _tourService.GetAllForAdminAsync(cancellationToken)).ToList(),
+            Tours = (await _tourService.GetAllToursForAdminAsync(cancellationToken)).ToList(),
             Bookings = (await _bookingService.GetAllForAdminAsync(cancellationToken)).ToList()
         };
     }

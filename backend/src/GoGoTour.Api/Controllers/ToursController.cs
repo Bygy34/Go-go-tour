@@ -1,5 +1,5 @@
+using GoGoTour.Application.Abstractions;
 using GoGoTour.Application.DTOs;
-using GoGoTour.Application.Services;
 using GoGoTour.Infrastructure.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -9,9 +9,9 @@ namespace GoGoTour.Api.Controllers;
 [Route("api/tours")]
 public class ToursController : BaseAdminController
 {
-    private readonly TourService _tourService;
+    private readonly ITourService _tourService;
 
-    public ToursController(TourService tourService, IOptions<AdminAuthOptions> adminAuthOptions) : base(adminAuthOptions)
+    public ToursController(ITourService tourService, IOptions<AdminAuthOptions> adminAuthOptions) : base(adminAuthOptions)
     {
         _tourService = tourService;
     }

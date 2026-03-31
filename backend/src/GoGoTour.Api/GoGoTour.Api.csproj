@@ -5,8 +5,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../GoGoTour.Application/GoGoTour.Application.csproj" />
     <ProjectReference Include="../GoGoTour.Infrastructure/GoGoTour.Infrastructure.csproj" />
-    <ProjectReference Include="..\GoGoTour.Domain\GoGoTour.Domain.csproj" />
+    <ProjectReference Include="..\GoGoTour.Application\GoGoTour.Application.csproj" />
   </ItemGroup>
 </Project>

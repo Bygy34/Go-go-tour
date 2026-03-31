@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GoGoTour.Application.Services;
 
-public class TourService
+public class TourService : ITourService
 {
     private readonly IGoGoTourDbContext _dbContext;
 

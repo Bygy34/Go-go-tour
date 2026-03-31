@@ -4,8 +4,8 @@ namespace GoGoTour.Api.Models;
 
 public class AdminPageVm
 {
-    public List<TourDetailsDto> Tours { get; set; } = new List<TourDetailsDto>();
-    public List<BookingListItemDto> Bookings { get; set; } = new List<BookingListItemDto>();
+    public List<TourDetailDto> Tours { get; set; } = new List<TourDetailDto>();
+    public List<BookingAdminDto> Bookings { get; set; } = new List<BookingAdminDto>();
     public TourFormVm TourForm { get; set; } = new();
     public string? Message { get; set; }
 }

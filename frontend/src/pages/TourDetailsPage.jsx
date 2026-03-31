@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import BookingForm from '../components/BookingForm'
 
-const API = 'http://localhost:5000/api'
+const API = '/api'
 
 export default function TourDetailsPage() {
   const { id } = useParams()
