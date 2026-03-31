@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../GoGoTour.Domain/GoGoTour.Domain.csproj" />
+  </ItemGroup>
+</Project>

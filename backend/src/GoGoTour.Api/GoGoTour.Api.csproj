@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../GoGoTour.Application/GoGoTour.Application.csproj" />
+    <ProjectReference Include="../GoGoTour.Infrastructure/GoGoTour.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
