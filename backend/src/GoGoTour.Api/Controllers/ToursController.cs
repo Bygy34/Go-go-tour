@@ -61,6 +61,6 @@ public class ToursController : BaseAdminController
         }
 
         var updated = await _tourService.UpdateTourAsync(id, dto, cancellationToken);
-        return updated ? NoContent() : NotFound();
+        return NotFound();
     }
 }
