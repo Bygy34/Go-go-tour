@@ -1,15 +1,11 @@
 const githubToken = process.env.GITHUB_TOKEN;
-const openAiKey = process.env.OPENAI_API_KEY;
-const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+const githubToken = process.env.GITHUB_TOKEN;
+const model = process.env.AI_MODEL || "gpt-4o-mini";
 const repo = process.env.GITHUB_REPOSITORY;
 const prNumber = process.env.PR_NUMBER;
 
 if (!githubToken) {
   throw new Error("GITHUB_TOKEN is required");
-}
-
-if (!openAiKey) {
-  throw new Error("OPENAI_API_KEY is required. Add it to repository secrets.");
 }
 
 if (!repo || !prNumber) {
@@ -102,10 +98,10 @@ async function runAiReview(pr, files) {
     diff || "(нет текстовых изменений)",
   ].join("\n\n");
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  const response = await fetch("https://models.inference.ai.azure.com/chat/completions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${openAiKey}`,
+      Authorization: `Bearer ${githubToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -120,7 +116,7 @@ async function runAiReview(pr, files) {
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`OpenAI API ${response.status}: ${text}`);
+    throw new Error(`AI API ${response.status}: ${text}`);
   }
 
   const data = await response.json();
@@ -149,9 +145,11 @@ async function upsertPrComment(body) {
 }
 
 (async () => {
+  console.log(`Reviewing PR #${prNumber}...`);
   const pr = await getPrMeta();
   const files = await getPrFiles();
+  console.log(`Found ${files.length} changed files.`);
   const aiText = await runAiReview(pr, files);
   await upsertPrComment(aiText);
-  console.log("AI PR review comment posted.");
+  console.log("AI review comment posted.");
 })();
