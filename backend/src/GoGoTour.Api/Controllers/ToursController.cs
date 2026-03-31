@@ -26,7 +26,7 @@ public class ToursController : BaseAdminController
     public async Task<ActionResult<TourDetailDto>> GetById([FromRoute] int id, CancellationToken cancellationToken)
     {
         var tour = await _tourService.GetTourByIdAsync(id, cancellationToken);
-        return tour is null ? NotFound() : Ok(tour);
+        return Ok(tour);
     }
 
     [HttpGet("admin")]
